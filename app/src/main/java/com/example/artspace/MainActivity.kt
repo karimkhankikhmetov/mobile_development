@@ -1,5 +1,6 @@
 package com.example.artspace
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -26,9 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ArtSpaceApp(modifier: Modifier = Modifier) {
-    var currentArtwork by remember { mutableStateOf(1) }
+    var currentArtwork by rememberSaveable() { mutableStateOf(1) }
 
     val imageRes = when (currentArtwork) {
         1 -> R.drawable.art1
@@ -76,21 +79,50 @@ fun ArtSpaceApp(modifier: Modifier = Modifier) {
         else -> "1831"
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .safeDrawingPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(24.dp)
-    ) {
-        ArtworkWall(imageRes = imageRes, description = title)
-        ArtworkDescriptor(title = title, artist = artist, year = year)
-        DisplayController(
-            onPrevious = { currentArtwork = if (currentArtwork == 1) 3 else currentArtwork - 1 },
-            onNext = { currentArtwork = if (currentArtwork == 3) 1 else currentArtwork + 1 }
-        )
+    val onPrevious = { currentArtwork = if (currentArtwork == 1) 3 else currentArtwork - 1 }
+    val onNext = { currentArtwork = if (currentArtwork == 3) 1 else currentArtwork + 1 }
+
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ArtworkWall(
+                imageRes = imageRes,
+                description = title,
+                modifier = Modifier.weight(1f)
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                ArtworkDescriptor(title = title, artist = artist, year = year)
+                DisplayController(onPrevious = onPrevious, onNext = onNext)
+            }
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            ArtworkWall(imageRes = imageRes, description = title)
+            ArtworkDescriptor(title = title, artist = artist, year = year)
+            DisplayController(onPrevious = onPrevious, onNext = onNext)
+        }
     }
 }
 
