@@ -87,7 +87,10 @@ fun ArtSpaceApp(modifier: Modifier = Modifier) {
     ) {
         ArtworkWall(imageRes = imageRes, description = title)
         ArtworkDescriptor(title = title, artist = artist, year = year)
-        DisplayController(onPrevious = {}, onNext = {})
+        DisplayController(
+            onPrevious = { currentArtwork = if (currentArtwork == 1) 3 else currentArtwork - 1 },
+            onNext = { currentArtwork = if (currentArtwork == 3) 1 else currentArtwork + 1 }
+        )
     }
 }
 
