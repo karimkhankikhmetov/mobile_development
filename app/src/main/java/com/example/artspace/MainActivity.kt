@@ -23,6 +23,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -49,6 +53,29 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun ArtSpaceApp(modifier: Modifier = Modifier) {
+    var currentArtwork by remember { mutableStateOf(1) }
+
+    val imageRes = when (currentArtwork) {
+        1 -> R.drawable.art1
+        2 -> R.drawable.art2
+        else -> R.drawable.art3
+    }
+    val title = when (currentArtwork) {
+        1 -> "Mona Lisa"
+        2 -> "The Starry Night"
+        else -> "The Great Wave off Kanagawa"
+    }
+    val artist = when (currentArtwork) {
+        1 -> "Leonardo da Vinci"
+        2 -> "Vincent van Gogh"
+        else -> "Katsushika Hokusai"
+    }
+    val year = when (currentArtwork) {
+        1 -> "1503"
+        2 -> "1889"
+        else -> "1831"
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -58,8 +85,8 @@ fun ArtSpaceApp(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        ArtworkWall(imageRes = R.drawable.art1, description = "Artwork 1")
-        ArtworkDescriptor(title = "Title 1", artist = "Artist 1", year = "2020")
+        ArtworkWall(imageRes = imageRes, description = title)
+        ArtworkDescriptor(title = title, artist = artist, year = year)
         DisplayController(onPrevious = {}, onNext = {})
     }
 }
